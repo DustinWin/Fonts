@@ -23,11 +23,12 @@ jobs:
         echo "sarasa_download_url=https://github.com/be5invis/Sarasa-Gothic/releases/download" >> ${GITHUB_ENV}
         echo "lxgw_download_url=https://github.com/lxgw/LxgwWenKai/releases/download" >> ${GITHUB_ENV}
         echo "source_download_url=https://github.com/adobe-fonts/source-han-serif/releases/download" >> ${GITHUB_ENV}
+        echo "noto_download_url=https://raw.githubusercontent.com/googlefonts/noto-emoji/main/fonts/NotoColorEmoji_WindowsCompatible.ttf" >> ${GITHUB_ENV}
       shell: bash
 
     - name: Download `MiSans`
       run: |
-        mkdir -p ./tmp/ ./MiSans/ ./FiraCode-Nerd/ ./Sarasa-Gothic/ ./LxgwWenKai/ ./Source-Han-Serif/ ./fonts/
+        mkdir -p ./tmp/ ./MiSans/ ./fonts/
         wget -P ./tmp/ "${misans_download_url}"
         unzip -o ./tmp/MiSans.zip -d ./tmp/
         misans_time=$(date -d "$(stat -c %y "./tmp/MiSans/otf/MiSans-Regular.otf")" +"%Y-%m-%d")
@@ -37,7 +38,7 @@ jobs:
 
     - name: Download `FiraCode Nerd`
       run: |
-        mkdir -p ./tmp/FiraCode-Nerd/
+        mkdir -p ./tmp/FiraCode-Nerd/ ./FiraCode-Nerd/
         firacode_version=$(curl -sSL https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest | grep 'tag_name' | awk -F'"' '{print $4}')
         echo "firacode_version=$firacode_version" >> ${GITHUB_ENV}
         firacode_time=$(curl -sSL https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest | grep 'published_at' | awk -F'"' '{print $4}' | sed 's/T.*//')
@@ -49,7 +50,7 @@ jobs:
 
     - name: Download `Sarasa Gothic`
       run: |
-        mkdir -p ./tmp/Sarasa-Gothic/
+        mkdir -p ./tmp/Sarasa-Gothic/ ./Sarasa-Gothic/
         sarasa_version=$(curl -sSL https://api.github.com/repos/be5invis/Sarasa-Gothic/releases/latest | grep 'tag_name' | awk -F'"' '{print $4}' | sed 's/^v//')
         echo "sarasa_version=$sarasa_version" >> ${GITHUB_ENV}
         sarasa_time=$(curl -sSL https://api.github.com/repos/be5invis/Sarasa-Gothic/releases/latest | grep 'published_at' | awk -F'"' '{print $4}' | sed 's/T.*//')
@@ -61,7 +62,7 @@ jobs:
 
     - name: Download `LxgwWenKai`
       run: |
-        mkdir -p ./tmp/LxgwWenKai/
+        mkdir -p ./tmp/LxgwWenKai/ ./LxgwWenKai/
         lxgw_version=$(curl -sSL https://api.github.com/repos/lxgw/LxgwWenKai/releases/latest | grep 'tag_name' | awk -F'"' '{print $4}')
         echo "lxgw_version=$lxgw_version" >> ${GITHUB_ENV}
         lxgw_time=$(curl -sSL https://api.github.com/repos/lxgw/LxgwWenKai/releases/latest | grep 'published_at' | awk -F'"' '{print $4}' | sed 's/T.*//')
@@ -73,7 +74,7 @@ jobs:
 
     - name: Download `Source Han Serif`
       run: |
-        mkdir -p ./tmp/Source-Han-Serif/
+        mkdir -p ./tmp/Source-Han-Serif/ ./Source-Han-Serif/
         source_version=$(curl -sSL https://api.github.com/repos/adobe-fonts/source-han-serif/releases/latest | grep 'tag_name' | awk -F'"' '{print $4}')
         echo "source_version=$source_version" >> ${GITHUB_ENV}
         source_time=$(curl -sSL https://api.github.com/repos/adobe-fonts/source-han-serif/releases/latest | grep 'published_at' | awk -F'"' '{print $4}' | sed 's/T.*//')
@@ -82,6 +83,16 @@ jobs:
         unzip -o ./tmp/09_SourceHanSerifSC.zip -d ./tmp/
         cp -f ./tmp/OTF/SimplifiedChinese/SourceHanSerifSC-* ./Source-Han-Serif/
         rm -rf ./tmp*
+
+    - name: Download `Noto Color Emoji`
+      run: |
+        mkdir -p ./Noto-Color-Emoji/
+        noto_version=$(curl -sSL https://raw.githubusercontent.com/googlefonts/noto-emoji/main/NotoColorEmoji.tmpl.ttx.tmpl | grep 'fontRevision' | awk -F'"' '{print $2}')
+        echo "noto_version=$noto_version" >> ${GITHUB_ENV}
+        noto_time=$(curl -sSL https://raw.githubusercontent.com/googlefonts/noto-emoji/main/NotoColorEmoji.tmpl.ttx.tmpl | grep 'created' | awk -F'"' '{print $2}' | xargs -I{} date -d "{}" "+%Y-%m-%d")
+        echo "noto_time=$noto_time" >> ${GITHUB_ENV}
+        wget -P ./Noto-Color-Emoji/ "${noto_download_url}"
+
 
     - name: Zip `MiSans`
       uses: montudor/action-zip@v1
@@ -108,6 +119,12 @@ jobs:
       with:
         args: zip -qq -r ./fonts/Source-Han-Serif.zip ./Source-Han-Serif/
 
+
+    - name: Zip `Noto Color Emoji`
+      uses: montudor/action-zip@v1
+      with:
+        args: zip -qq -r ./fonts/Noto-Color-Emoji.zip ./Noto-Color-Emoji/
+
     - name: Release and upload `fonts` assets
       uses: svenstaro/upload-release-action@v2
       with:
@@ -121,6 +138,7 @@ jobs:
           更新 [Sarasa Gothic](https://github.com/be5invis/Sarasa-Gothic) 字体至 v${{ env.sarasa_version }}，发布于 ${{ env.sarasa_time }}
           更新 [LxgwWenKai](https://github.com/lxgw/LxgwWenKai) 字体至 ${{ env.lxgw_version }}，发布于 ${{ env.lxgw_time }}
           更新 [Source Han Serif](https://github.com/adobe-fonts/source-han-serif) 字体至 v${{ env.source_version }}，发布于 ${{ env.source_time }}
+          更新 [Noto Color Emoji](https://github.com/googlefonts/noto-emoji) 字体至 v${{ env.noto_version }}，发布于 ${{ env.noto_time }}
         file_glob: true
         file: ./fonts/*
 
