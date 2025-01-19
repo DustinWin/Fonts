@@ -39,9 +39,9 @@ jobs:
     - name: Download `FiraCode Nerd`
       run: |
         mkdir -p ./tmp/FiraCode-Nerd/ ./FiraCode-Nerd/
-        firacode_version=$(curl -sSL https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest | grep 'tag_name' | awk -F'"' '{print $4}')
+        firacode_version=$(curl -sSL https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest | jq -r '.tag_name')
         echo "firacode_version=$firacode_version" >> ${GITHUB_ENV}
-        firacode_time=$(curl -sSL https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest | grep 'published_at' | awk -F'"' '{print $4}' | sed 's/T.*//')
+        firacode_time=$(curl -sSL https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest | jq -r '.created_at' | xargs -I {} date -d '{} +8 hours' '+%Y-%m-%d')
         echo "firacode_time=$firacode_time" >> ${GITHUB_ENV}
         wget -P ./tmp/ "${firacode_download_url}/${firacode_version}/FiraCode.zip"
         unzip -o ./tmp/FiraCode.zip -d ./tmp/FiraCode-Nerd/
@@ -51,9 +51,9 @@ jobs:
     - name: Download `Sarasa Gothic`
       run: |
         mkdir -p ./tmp/Sarasa-Gothic/ ./Sarasa-Gothic/
-        sarasa_version=$(curl -sSL https://api.github.com/repos/be5invis/Sarasa-Gothic/releases/latest | grep 'tag_name' | awk -F'"' '{print $4}' | sed 's/^v//')
+        sarasa_version=$(curl -sSL https://api.github.com/repos/be5invis/Sarasa-Gothic/releases/latest | jq -r '.tag_name' | sed 's/^v//')
         echo "sarasa_version=$sarasa_version" >> ${GITHUB_ENV}
-        sarasa_time=$(curl -sSL https://api.github.com/repos/be5invis/Sarasa-Gothic/releases/latest | grep 'published_at' | awk -F'"' '{print $4}' | sed 's/T.*//')
+        sarasa_time=$(curl -sSL https://api.github.com/repos/be5invis/Sarasa-Gothic/releases/latest | jq -r '.created_at' | xargs -I {} date -d '{} +8 hours' '+%Y-%m-%d')
         echo "sarasa_time=$sarasa_time" >> ${GITHUB_ENV}
         wget -P ./tmp/ "${sarasa_download_url}/v${sarasa_version}/SarasaMonoSC-TTF-${sarasa_version}.7z"
         7z x "./tmp/SarasaMonoSC-TTF-${sarasa_version}.7z" -otmp/Sarasa-Gothic/
@@ -63,9 +63,9 @@ jobs:
     - name: Download `LxgwWenKai`
       run: |
         mkdir -p ./tmp/LxgwWenKai/ ./LxgwWenKai/
-        lxgw_version=$(curl -sSL https://api.github.com/repos/lxgw/LxgwWenKai/releases/latest | grep 'tag_name' | awk -F'"' '{print $4}')
+        lxgw_version=$(curl -sSL https://api.github.com/repos/lxgw/LxgwWenKai/releases/latest | jq -r '.tag_name')
         echo "lxgw_version=$lxgw_version" >> ${GITHUB_ENV}
-        lxgw_time=$(curl -sSL https://api.github.com/repos/lxgw/LxgwWenKai/releases/latest | grep 'published_at' | awk -F'"' '{print $4}' | sed 's/T.*//')
+        lxgw_time=$(curl -sSL https://api.github.com/repos/lxgw/LxgwWenKai/releases/latest | jq -r '.created_at' | xargs -I {} date -d '{} +8 hours' '+%Y-%m-%d')
         echo "lxgw_time=$lxgw_time" >> ${GITHUB_ENV}
         wget -P ./tmp/ "${lxgw_download_url}/${lxgw_version}/lxgw-wenkai-${lxgw_version}.zip"
         unzip -o "./tmp/lxgw-wenkai-${lxgw_version}.zip" -d ./tmp/
@@ -75,9 +75,9 @@ jobs:
     - name: Download `Source Han Serif`
       run: |
         mkdir -p ./tmp/Source-Han-Serif/ ./Source-Han-Serif/
-        source_version=$(curl -sSL https://api.github.com/repos/adobe-fonts/source-han-serif/releases/latest | grep 'tag_name' | awk -F'"' '{print $4}')
+        source_version=$(curl -sSL https://api.github.com/repos/adobe-fonts/source-han-serif/releases/latest | jq -r '.tag_name')
         echo "source_version=$source_version" >> ${GITHUB_ENV}
-        source_time=$(curl -sSL https://api.github.com/repos/adobe-fonts/source-han-serif/releases/latest | grep 'published_at' | awk -F'"' '{print $4}' | sed 's/T.*//')
+        source_time=$(curl -sSL https://api.github.com/repos/adobe-fonts/source-han-serif/releases/latest | jq -r '.created_at' | xargs -I {} date -d '{} +8 hours' '+%Y-%m-%d')
         echo "source_time=$source_time" >> ${GITHUB_ENV}
         wget -P ./tmp/ "${source_download_url}/${source_version}/09_SourceHanSerifSC.zip"
         unzip -o ./tmp/09_SourceHanSerifSC.zip -d ./tmp/
@@ -89,7 +89,7 @@ jobs:
         mkdir -p ./Noto-Color-Emoji/
         noto_version=$(curl -sSL https://raw.githubusercontent.com/googlefonts/noto-emoji/main/NotoColorEmoji.tmpl.ttx.tmpl | grep 'fontRevision' | awk -F'"' '{print $2}')
         echo "noto_version=$noto_version" >> ${GITHUB_ENV}
-        noto_time=$(curl -sSL https://raw.githubusercontent.com/googlefonts/noto-emoji/main/NotoColorEmoji.tmpl.ttx.tmpl | grep 'created' | awk -F'"' '{print $2}' | xargs -I{} date -d "{}" "+%Y-%m-%d")
+        noto_time=$(curl -sSL https://raw.githubusercontent.com/googlefonts/noto-emoji/main/NotoColorEmoji.tmpl.ttx.tmpl | grep 'created' | awk -F'"' '{print $2}' | xargs -I {} date -d '{} +8 hours' '+%Y-%m-%d')
         echo "noto_time=$noto_time" >> ${GITHUB_ENV}
         wget -P ./Noto-Color-Emoji/ "${noto_download_url}"
 
